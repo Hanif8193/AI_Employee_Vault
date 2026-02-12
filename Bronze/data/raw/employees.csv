@@ -1,0 +1,31 @@
+id,name,age,department,role,salary,experience_years,city
+1,John Smith,35,Engineering,Senior Data Engineer,95000,8,San Francisco
+2,Maria Garcia,28,Engineering,ML Engineer,85000,4,New York
+3,James Wilson,42,HR,HR Manager,75000,15,Chicago
+4,Emily Chen,31,Data Science,Data Scientist,90000,6,Austin
+5,Michael Brown,39,Engineering,DevOps Engineer,88000,10,Seattle
+6,Sarah Johnson,26,Marketing,Marketing Analyst,62000,3,Boston
+7,David Lee,33,Data Science,Senior Data Scientist,98000,7,San Francisco
+8,Lisa Anderson,29,Engineering,Software Engineer,80000,5,New York
+9,Robert Taylor,45,Finance,Financial Analyst,82000,18,Chicago
+10,Jennifer Martinez,37,Data Science,AI Research Scientist,105000,9,San Francisco
+11,William Davis,30,Engineering,Data Engineer,78000,5,Austin
+12,Jessica Rodriguez,27,HR,Talent Acquisition Specialist,65000,4,Seattle
+13,Daniel Thompson,41,Engineering,Engineering Manager,115000,14,San Francisco
+14,Amanda White,34,Data Science,Machine Learning Engineer,92000,7,New York
+15,Christopher Harris,36,Finance,Senior Financial Analyst,88000,11,Boston
+16,Ashley Clark,25,Marketing,Digital Marketing Specialist,58000,2,Austin
+17,Matthew Lewis,38,Engineering,Cloud Architect,102000,12,Seattle
+18,Stephanie Walker,32,Data Science,Data Analyst,72000,6,Chicago
+19,Joshua Hall,29,Engineering,Backend Engineer,83000,5,San Francisco
+20,Nicole Allen,31,HR,HR Business Partner,70000,7,New York
+21,Kevin Young,43,Engineering,Principal Engineer,125000,16,San Francisco
+22,Elizabeth King,28,Data Science,Junior Data Scientist,68000,3,Austin
+23,Ryan Wright,35,Finance,Finance Manager,95000,10,Chicago
+24,Lauren Scott,30,Marketing,Product Marketing Manager,85000,6,Boston
+25,Brandon Green,33,Engineering,Site Reliability Engineer,90000,8,Seattle
+26,Samantha Adams,27,Data Science,NLP Engineer,87000,4,New York
+27,Justin Baker,40,Engineering,VP of Engineering,145000,17,San Francisco
+28,Rachel Nelson,26,HR,Recruiter,60000,3,Austin
+29,Andrew Carter,37,Data Science,Computer Vision Engineer,96000,9,Seattle
+30,Michelle Mitchell,32,Finance,Budget Analyst,76000,7,Chicago
