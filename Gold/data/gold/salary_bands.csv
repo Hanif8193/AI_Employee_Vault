@@ -1,0 +1,6 @@
+salary_band,total_employees,avg_salary,avg_experience_years
+Entry ($50-70K),6,63833.33,3.67
+Mid ($70-90K),14,82785.71,7.86
+Senior ($90-110K),7,97571.43,8.86
+Lead ($110-130K),2,120000.0,15.0
+Executive ($130K+),1,145000.0,17.0

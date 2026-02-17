@@ -1,0 +1,6 @@
+rank,name,role,department,salary,experience_years,city
+1,Justin Baker,VP of Engineering,Engineering,145000,17,San Francisco
+2,Kevin Young,Principal Engineer,Engineering,125000,16,San Francisco
+3,Daniel Thompson,Engineering Manager,Engineering,115000,14,San Francisco
+4,Jennifer Martinez,AI Research Scientist,Data Science,105000,9,San Francisco
+5,Matthew Lewis,Cloud Architect,Engineering,102000,12,Seattle

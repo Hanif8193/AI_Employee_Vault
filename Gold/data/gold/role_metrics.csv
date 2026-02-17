@@ -1,0 +1,31 @@
+role,total_employees,avg_salary,avg_experience_years,avg_age
+VP of Engineering,1,145000.0,17.0,40.0
+Principal Engineer,1,125000.0,16.0,43.0
+Engineering Manager,1,115000.0,14.0,41.0
+AI Research Scientist,1,105000.0,9.0,37.0
+Cloud Architect,1,102000.0,12.0,38.0
+Senior Data Scientist,1,98000.0,7.0,33.0
+Computer Vision Engineer,1,96000.0,9.0,37.0
+Senior Data Engineer,1,95000.0,8.0,35.0
+Finance Manager,1,95000.0,10.0,35.0
+Machine Learning Engineer,1,92000.0,7.0,34.0
+Site Reliability Engineer,1,90000.0,8.0,33.0
+Data Scientist,1,90000.0,6.0,31.0
+DevOps Engineer,1,88000.0,10.0,39.0
+Senior Financial Analyst,1,88000.0,11.0,36.0
+NLP Engineer,1,87000.0,4.0,27.0
+ML Engineer,1,85000.0,4.0,28.0
+Product Marketing Manager,1,85000.0,6.0,30.0
+Backend Engineer,1,83000.0,5.0,29.0
+Financial Analyst,1,82000.0,18.0,45.0
+Software Engineer,1,80000.0,5.0,29.0
+Data Engineer,1,78000.0,5.0,30.0
+Budget Analyst,1,76000.0,7.0,32.0
+HR Manager,1,75000.0,15.0,42.0
+Data Analyst,1,72000.0,6.0,32.0
+HR Business Partner,1,70000.0,7.0,31.0
+Junior Data Scientist,1,68000.0,3.0,28.0
+Talent Acquisition Specialist,1,65000.0,4.0,27.0
+Marketing Analyst,1,62000.0,3.0,26.0
+Recruiter,1,60000.0,3.0,26.0
+Digital Marketing Specialist,1,58000.0,2.0,25.0

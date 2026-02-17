@@ -1,0 +1,31 @@
+department,role,employee_count,avg_salary
+Data Science,AI Research Scientist,1,105000.0
+Data Science,Computer Vision Engineer,1,96000.0
+Data Science,Data Analyst,1,72000.0
+Data Science,Data Scientist,1,90000.0
+Data Science,Junior Data Scientist,1,68000.0
+Data Science,Machine Learning Engineer,1,92000.0
+Data Science,NLP Engineer,1,87000.0
+Data Science,Senior Data Scientist,1,98000.0
+Engineering,Backend Engineer,1,83000.0
+Engineering,Cloud Architect,1,102000.0
+Engineering,Data Engineer,1,78000.0
+Engineering,DevOps Engineer,1,88000.0
+Engineering,Engineering Manager,1,115000.0
+Engineering,ML Engineer,1,85000.0
+Engineering,Principal Engineer,1,125000.0
+Engineering,Senior Data Engineer,1,95000.0
+Engineering,Site Reliability Engineer,1,90000.0
+Engineering,Software Engineer,1,80000.0
+Engineering,VP of Engineering,1,145000.0
+Finance,Budget Analyst,1,76000.0
+Finance,Finance Manager,1,95000.0
+Finance,Financial Analyst,1,82000.0
+Finance,Senior Financial Analyst,1,88000.0
+HR,HR Business Partner,1,70000.0
+HR,HR Manager,1,75000.0
+HR,Recruiter,1,60000.0
+HR,Talent Acquisition Specialist,1,65000.0
+Marketing,Digital Marketing Specialist,1,58000.0
+Marketing,Marketing Analyst,1,62000.0
+Marketing,Product Marketing Manager,1,85000.0
