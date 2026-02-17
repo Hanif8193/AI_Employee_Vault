@@ -1,0 +1,6 @@
+experience_band,total_employees,avg_salary,avg_age
+Entry (0-2yr),1,58000.0,25.0
+Junior (3-5yr),9,74222.22,27.78
+Mid (6-10yr),13,88615.38,33.77
+Senior (11-15yr),4,95000.0,39.25
+Expert (16+yr),3,117333.33,42.67

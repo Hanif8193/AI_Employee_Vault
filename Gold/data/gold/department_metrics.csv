@@ -1,0 +1,6 @@
+department,total_employees,avg_salary,min_salary,max_salary,total_payroll,avg_age,avg_experience_years,salary_range
+Engineering,11,98727.27,78000,145000,1086000,35.0,9.45,67000
+Data Science,8,88500.0,68000,105000,708000,32.38,6.38,37000
+Finance,4,85250.0,76000,95000,341000,37.0,11.5,19000
+HR,4,67500.0,60000,75000,270000,31.5,7.25,15000
+Marketing,3,68333.33,58000,85000,205000,27.0,3.67,27000
