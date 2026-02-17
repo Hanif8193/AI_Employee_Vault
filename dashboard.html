@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Employee Vault — Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0f1117;
+      --surface:  #1a1d27;
+      --border:   #2a2d3e;
+      --accent:   #6c63ff;
+      --accent2:  #00d4aa;
+      --accent3:  #ff6b6b;
+      --accent4:  #ffd166;
+      --text:     #e2e8f0;
+      --muted:    #8892a4;
+      --radius:   12px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: .02em; }
+    header h1 span { color: var(--accent); }
+    .badge {
+      font-size: .72rem;
+      background: var(--accent);
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    /* ── Layout ── */
+    main { max-width: 1400px; margin: 0 auto; padding: 28px 24px 48px; }
+
+    /* ── Section titles ── */
+    .section-title {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 32px 0 14px;
+    }
+
+    /* ── KPI cards ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+    }
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--kpi-color, var(--accent));
+    }
+    .kpi-label { font-size: .72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+    .kpi-value { font-size: 1.9rem; font-weight: 800; margin-top: 6px; line-height: 1; }
+    .kpi-sub   { font-size: .75rem; color: var(--muted); margin-top: 5px; }
+
+    /* ── Chart grid ── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+    .card h3 {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 18px;
+      letter-spacing: .02em;
+    }
+    .card.wide { grid-column: 1 / -1; }
+    .chart-wrap { position: relative; height: 240px; }
+    .chart-wrap.tall { height: 300px; }
+
+    /* ── Table ── */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    th {
+      text-align: left;
+      padding: 9px 12px;
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(108,99,255,.05); }
+    .pill {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: .7rem;
+      font-weight: 700;
+    }
+    .pill-eng  { background:#6c63ff22; color:#a59eff; }
+    .pill-ds   { background:#00d4aa22; color:#00d4aa; }
+    .pill-fin  { background:#ffd16622; color:#ffd166; }
+    .pill-hr   { background:#ff6b6b22; color:#ff6b6b; }
+    .pill-mkt  { background:#48cae422; color:#48cae4; }
+
+    .rank { font-weight: 800; color: var(--accent4); }
+    .salary { font-weight: 700; color: var(--accent2); }
+    .high { color: var(--accent2); font-weight: 700; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>AI Employee <span>Vault</span> — Workforce Dashboard</h1>
+  <span class="badge">Gold Layer · 2026-02-17</span>
+</header>
+
+<main>
+
+  <!-- KPI ROW -->
+  <p class="section-title">Workforce Overview</p>
+  <div class="kpi-grid">
+    <div class="kpi" style="--kpi-color:#6c63ff">
+      <div class="kpi-label">Total Employees</div>
+      <div class="kpi-value">30</div>
+      <div class="kpi-sub">Across 6 cities</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#00d4aa">
+      <div class="kpi-label">Avg Salary</div>
+      <div class="kpi-value">$87K</div>
+      <div class="kpi-sub">Median $86K</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#ffd166">
+      <div class="kpi-label">Total Payroll</div>
+      <div class="kpi-value">$2.61M</div>
+      <div class="kpi-sub">Annual</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#ff6b6b">
+      <div class="kpi-label">Departments</div>
+      <div class="kpi-value">5</div>
+      <div class="kpi-sub">Engineering largest</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#48cae4">
+      <div class="kpi-label">Avg Experience</div>
+      <div class="kpi-value">8.0<span style="font-size:1rem">yr</span></div>
+      <div class="kpi-sub">Avg age 33.3</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#a8dadc">
+      <div class="kpi-label">High Performers</div>
+      <div class="kpi-value">10</div>
+      <div class="kpi-sub">Top 25% salary</div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW 1 -->
+  <p class="section-title">Compensation & Headcount</p>
+  <div class="chart-grid">
+
+    <div class="card">
+      <h3>Avg Salary by Department</h3>
+      <div class="chart-wrap">
+        <canvas id="deptSalary"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Headcount by Department</h3>
+      <div class="chart-wrap">
+        <canvas id="deptHeadcount"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Salary Band Distribution</h3>
+      <div class="chart-wrap">
+        <canvas id="salaryBands"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Experience Band Distribution</h3>
+      <div class="chart-wrap">
+        <canvas id="expBands"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CHARTS ROW 2 -->
+  <p class="section-title">Office Locations</p>
+  <div class="chart-grid">
+    <div class="card">
+      <h3>Employees by City</h3>
+      <div class="chart-wrap">
+        <canvas id="cityEmp"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Avg Salary by City</h3>
+      <div class="chart-wrap">
+        <canvas id="citySalary"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Total Payroll by City ($)</h3>
+      <div class="chart-wrap">
+        <canvas id="cityPayroll"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP EARNERS TABLE -->
+  <p class="section-title">Top 5 Earners</p>
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th><th>Name</th><th>Role</th><th>Department</th>
+            <th>Salary</th><th>Experience</th><th>City</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="rank">#1</td><td>Justin Baker</td><td>VP of Engineering</td><td><span class="pill pill-eng">Engineering</span></td><td class="salary">$145,000</td><td>17 yr</td><td>San Francisco</td></tr>
+          <tr><td class="rank">#2</td><td>Kevin Young</td><td>Principal Engineer</td><td><span class="pill pill-eng">Engineering</span></td><td class="salary">$125,000</td><td>16 yr</td><td>San Francisco</td></tr>
+          <tr><td class="rank">#3</td><td>Daniel Thompson</td><td>Engineering Manager</td><td><span class="pill pill-eng">Engineering</span></td><td class="salary">$115,000</td><td>14 yr</td><td>San Francisco</td></tr>
+          <tr><td class="rank">#4</td><td>Jennifer Martinez</td><td>AI Research Scientist</td><td><span class="pill pill-ds">Data Science</span></td><td class="salary">$105,000</td><td>9 yr</td><td>San Francisco</td></tr>
+          <tr><td class="rank">#5</td><td>Matthew Lewis</td><td>Cloud Architect</td><td><span class="pill pill-eng">Engineering</span></td><td class="salary">$102,000</td><td>12 yr</td><td>Seattle</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DEPARTMENT METRICS TABLE -->
+  <p class="section-title">Department Breakdown</p>
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Department</th><th>Headcount</th><th>Avg Salary</th>
+            <th>Min Salary</th><th>Max Salary</th><th>Total Payroll</th>
+            <th>Avg Age</th><th>Avg Experience</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="pill pill-eng">Engineering</span></td><td>11</td><td class="salary">$98,727</td><td>$78,000</td><td>$145,000</td><td>$1,086,000</td><td>35.0</td><td>9.5 yr</td></tr>
+          <tr><td><span class="pill pill-ds">Data Science</span></td><td>8</td><td class="salary">$88,500</td><td>$68,000</td><td>$105,000</td><td>$708,000</td><td>32.4</td><td>6.4 yr</td></tr>
+          <tr><td><span class="pill pill-fin">Finance</span></td><td>4</td><td class="salary">$85,250</td><td>$76,000</td><td>$95,000</td><td>$341,000</td><td>37.0</td><td>11.5 yr</td></tr>
+          <tr><td><span class="pill pill-hr">HR</span></td><td>4</td><td class="salary">$67,500</td><td>$60,000</td><td>$75,000</td><td>$270,000</td><td>31.5</td><td>7.3 yr</td></tr>
+          <tr><td><span class="pill pill-mkt">Marketing</span></td><td>3</td><td class="salary">$68,333</td><td>$58,000</td><td>$85,000</td><td>$205,000</td><td>27.0</td><td>3.7 yr</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ALL EMPLOYEES TABLE -->
+  <p class="section-title">All Employees</p>
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Name</th><th>Department</th><th>Role</th>
+            <th>Salary</th><th>City</th><th>Exp</th><th>Performer</th>
+          </tr>
+        </thead>
+        <tbody id="empTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+const deptData = {
+  labels: ['Engineering','Data Science','Finance','HR','Marketing'],
+  avgSalary: [98727, 88500, 85250, 67500, 68333],
+  headcount: [11, 8, 4, 4, 3],
+  colors: ['#6c63ff','#00d4aa','#ffd166','#ff6b6b','#48cae4'],
+};
+
+const salaryBands = {
+  labels: ['$50-70K','$70-90K','$90-110K','$110-130K','$130K+'],
+  counts: [6, 14, 7, 2, 1],
+};
+
+const expBands = {
+  labels: ['Entry\n0-2yr','Junior\n3-5yr','Mid\n6-10yr','Senior\n11-15yr','Expert\n16+yr'],
+  counts: [1, 9, 13, 4, 3],
+  avgSalary: [58000, 74222, 88615, 95000, 117333],
+};
+
+const cityData = {
+  labels: ['San Francisco','Austin','New York','Chicago','Seattle','Boston'],
+  employees: [7, 5, 5, 5, 5, 3],
+  avgSalary: [109429, 70800, 82800, 80000, 88200, 78333],
+  payroll: [766000, 354000, 414000, 400000, 441000, 235000],
+};
+
+const employees = [
+  {id:1,name:'John Smith',dept:'Engineering',role:'Senior Data Engineer',salary:95000,city:'San Francisco',exp:8,high:1},
+  {id:2,name:'Maria Garcia',dept:'Engineering',role:'ML Engineer',salary:85000,city:'New York',exp:4,high:0},
+  {id:3,name:'James Wilson',dept:'HR',role:'HR Manager',salary:75000,city:'Chicago',exp:15,high:0},
+  {id:4,name:'Emily Chen',dept:'Data Science',role:'Data Scientist',salary:90000,city:'Austin',exp:6,high:0},
+  {id:5,name:'Michael Brown',dept:'Engineering',role:'DevOps Engineer',salary:88000,city:'Seattle',exp:10,high:0},
+  {id:6,name:'Sarah Johnson',dept:'Marketing',role:'Marketing Analyst',salary:62000,city:'Boston',exp:3,high:0},
+  {id:7,name:'David Lee',dept:'Data Science',role:'Senior Data Scientist',salary:98000,city:'San Francisco',exp:7,high:1},
+  {id:8,name:'Lisa Anderson',dept:'Engineering',role:'Software Engineer',salary:80000,city:'New York',exp:5,high:0},
+  {id:9,name:'Robert Taylor',dept:'Finance',role:'Financial Analyst',salary:82000,city:'Chicago',exp:18,high:0},
+  {id:10,name:'Jennifer Martinez',dept:'Data Science',role:'AI Research Scientist',salary:105000,city:'San Francisco',exp:9,high:1},
+  {id:11,name:'William Davis',dept:'Engineering',role:'Data Engineer',salary:78000,city:'Austin',exp:5,high:0},
+  {id:12,name:'Jessica Rodriguez',dept:'HR',role:'Talent Acquisition Specialist',salary:65000,city:'Seattle',exp:4,high:0},
+  {id:13,name:'Daniel Thompson',dept:'Engineering',role:'Engineering Manager',salary:115000,city:'San Francisco',exp:14,high:1},
+  {id:14,name:'Amanda White',dept:'Data Science',role:'Machine Learning Engineer',salary:92000,city:'New York',exp:7,high:0},
+  {id:15,name:'Christopher Harris',dept:'Finance',role:'Senior Financial Analyst',salary:88000,city:'Boston',exp:11,high:0},
+  {id:16,name:'Ashley Clark',dept:'Marketing',role:'Digital Marketing Specialist',salary:58000,city:'Austin',exp:2,high:0},
+  {id:17,name:'Matthew Lewis',dept:'Engineering',role:'Cloud Architect',salary:102000,city:'Seattle',exp:12,high:1},
+  {id:18,name:'Stephanie Walker',dept:'Data Science',role:'Data Analyst',salary:72000,city:'Chicago',exp:6,high:0},
+  {id:19,name:'Joshua Hall',dept:'Engineering',role:'Backend Engineer',salary:83000,city:'San Francisco',exp:5,high:0},
+  {id:20,name:'Nicole Allen',dept:'HR',role:'HR Business Partner',salary:70000,city:'New York',exp:7,high:0},
+  {id:21,name:'Kevin Young',dept:'Engineering',role:'Principal Engineer',salary:125000,city:'San Francisco',exp:16,high:1},
+  {id:22,name:'Elizabeth King',dept:'Data Science',role:'Junior Data Scientist',salary:68000,city:'Austin',exp:3,high:0},
+  {id:23,name:'Ryan Wright',dept:'Finance',role:'Finance Manager',salary:95000,city:'Chicago',exp:10,high:1},
+  {id:24,name:'Lauren Scott',dept:'Marketing',role:'Product Marketing Manager',salary:85000,city:'Boston',exp:6,high:0},
+  {id:25,name:'Brandon Green',dept:'Engineering',role:'Site Reliability Engineer',salary:90000,city:'Seattle',exp:8,high:0},
+  {id:26,name:'Samantha Adams',dept:'Data Science',role:'NLP Engineer',salary:87000,city:'New York',exp:4,high:0},
+  {id:27,name:'Justin Baker',dept:'Engineering',role:'VP of Engineering',salary:145000,city:'San Francisco',exp:17,high:1},
+  {id:28,name:'Rachel Nelson',dept:'HR',role:'Recruiter',salary:60000,city:'Austin',exp:3,high:0},
+  {id:29,name:'Andrew Carter',dept:'Data Science',role:'Computer Vision Engineer',salary:96000,city:'Seattle',exp:9,high:1},
+  {id:30,name:'Michelle Mitchell',dept:'Finance',role:'Budget Analyst',salary:76000,city:'Chicago',exp:7,high:0},
+];
+
+const deptPill = {
+  'Engineering': 'pill-eng', 'Data Science': 'pill-ds',
+  'Finance': 'pill-fin', 'HR': 'pill-hr', 'Marketing': 'pill-mkt',
+};
+
+// ── Render employee table ─────────────────────────────────────────────────────
+const tbody = document.getElementById('empTable');
+employees.forEach(e => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="color:var(--muted)">${e.id}</td>
+    <td><strong>${e.name}</strong></td>
+    <td><span class="pill ${deptPill[e.dept]}">${e.dept}</span></td>
+    <td style="color:var(--muted);font-size:.78rem">${e.role}</td>
+    <td class="salary">$${e.salary.toLocaleString()}</td>
+    <td>${e.city}</td>
+    <td>${e.exp} yr</td>
+    <td>${e.high ? '<span class="high">★ High</span>' : '<span style="color:var(--muted)">—</span>'}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+// ── Chart defaults ────────────────────────────────────────────────────────────
+Chart.defaults.color = '#8892a4';
+Chart.defaults.borderColor = '#2a2d3e';
+Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+
+const tooltipStyle = {
+  backgroundColor: '#1a1d27',
+  borderColor: '#2a2d3e',
+  borderWidth: 1,
+  titleColor: '#e2e8f0',
+  bodyColor: '#8892a4',
+  padding: 10,
+};
+
+// ── Chart 1: Avg salary by department (horizontal bar) ───────────────────────
+new Chart(document.getElementById('deptSalary'), {
+  type: 'bar',
+  data: {
+    labels: deptData.labels,
+    datasets: [{
+      label: 'Avg Salary ($)',
+      data: deptData.avgSalary,
+      backgroundColor: deptData.colors.map(c => c + 'bb'),
+      borderColor: deptData.colors,
+      borderWidth: 2,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: {
+      label: ctx => ' $' + ctx.parsed.x.toLocaleString()
+    }, ...tooltipStyle }},
+    scales: {
+      x: { grid: { color: '#2a2d3e' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'K' }},
+      y: { grid: { display: false }},
+    }
+  }
+});
+
+// ── Chart 2: Headcount by department (donut) ──────────────────────────────────
+new Chart(document.getElementById('deptHeadcount'), {
+  type: 'doughnut',
+  data: {
+    labels: deptData.labels,
+    datasets: [{
+      data: deptData.headcount,
+      backgroundColor: deptData.colors.map(c => c + 'bb'),
+      borderColor: deptData.colors,
+      borderWidth: 2,
+      hoverOffset: 8,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '65%',
+    plugins: {
+      legend: { position: 'right', labels: { padding: 14, boxWidth: 12, font: { size: 12 }}},
+      tooltip: { callbacks: {
+        label: ctx => ` ${ctx.label}: ${ctx.parsed} employees`
+      }, ...tooltipStyle }
+    }
+  }
+});
+
+// ── Chart 3: Salary bands (bar) ───────────────────────────────────────────────
+new Chart(document.getElementById('salaryBands'), {
+  type: 'bar',
+  data: {
+    labels: salaryBands.labels,
+    datasets: [{
+      label: 'Employees',
+      data: salaryBands.counts,
+      backgroundColor: ['#48cae4bb','#00d4aabb','#6c63ffbb','#ffd166bb','#ff6b6bbb'],
+      borderColor:     ['#48cae4',  '#00d4aa',  '#6c63ff',  '#ffd166',  '#ff6b6b'],
+      borderWidth: 2,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { ...tooltipStyle }},
+    scales: {
+      y: { grid: { color: '#2a2d3e' }, ticks: { stepSize: 2 }},
+      x: { grid: { display: false }},
+    }
+  }
+});
+
+// ── Chart 4: Experience bands (bar) ──────────────────────────────────────────
+new Chart(document.getElementById('expBands'), {
+  type: 'bar',
+  data: {
+    labels: ['Entry\n0-2yr','Junior\n3-5yr','Mid\n6-10yr','Senior\n11-15yr','Expert\n16+yr'],
+    datasets: [{
+      label: 'Employees',
+      data: expBands.counts,
+      backgroundColor: '#6c63ffbb',
+      borderColor: '#6c63ff',
+      borderWidth: 2,
+      borderRadius: 6,
+      yAxisID: 'y',
+    }, {
+      label: 'Avg Salary',
+      data: expBands.avgSalary,
+      type: 'line',
+      borderColor: '#00d4aa',
+      backgroundColor: '#00d4aa22',
+      borderWidth: 2,
+      pointBackgroundColor: '#00d4aa',
+      pointRadius: 4,
+      tension: 0.4,
+      fill: true,
+      yAxisID: 'y2',
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 }}}, tooltip: { ...tooltipStyle,
+      callbacks: { label: ctx => ctx.datasetIndex === 1
+        ? ' Avg Salary: $' + ctx.parsed.y.toLocaleString()
+        : ' Employees: ' + ctx.parsed.y }
+    }},
+    scales: {
+      y:  { grid: { color: '#2a2d3e' }, position: 'left',  ticks: { stepSize: 2 }},
+      y2: { grid: { display: false }, position: 'right', ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'K' }},
+      x:  { grid: { display: false }},
+    }
+  }
+});
+
+// ── Chart 5: Employees by city (bar) ─────────────────────────────────────────
+new Chart(document.getElementById('cityEmp'), {
+  type: 'bar',
+  data: {
+    labels: cityData.labels,
+    datasets: [{
+      label: 'Employees',
+      data: cityData.employees,
+      backgroundColor: '#6c63ffbb',
+      borderColor: '#6c63ff',
+      borderWidth: 2,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { ...tooltipStyle }},
+    scales: {
+      y: { grid: { color: '#2a2d3e' }, ticks: { stepSize: 1 }},
+      x: { grid: { display: false }},
+    }
+  }
+});
+
+// ── Chart 6: Avg salary by city ───────────────────────────────────────────────
+new Chart(document.getElementById('citySalary'), {
+  type: 'bar',
+  data: {
+    labels: cityData.labels,
+    datasets: [{
+      label: 'Avg Salary',
+      data: cityData.avgSalary,
+      backgroundColor: '#00d4aabb',
+      borderColor: '#00d4aa',
+      borderWidth: 2,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: {
+      label: ctx => ' $' + ctx.parsed.y.toLocaleString()
+    }, ...tooltipStyle }},
+    scales: {
+      y: { grid: { color: '#2a2d3e' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'K' }},
+      x: { grid: { display: false }},
+    }
+  }
+});
+
+// ── Chart 7: Total payroll by city ────────────────────────────────────────────
+new Chart(document.getElementById('cityPayroll'), {
+  type: 'bar',
+  data: {
+    labels: cityData.labels,
+    datasets: [{
+      label: 'Total Payroll',
+      data: cityData.payroll,
+      backgroundColor: '#ffd166bb',
+      borderColor: '#ffd166',
+      borderWidth: 2,
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: {
+      label: ctx => ' $' + ctx.parsed.y.toLocaleString()
+    }, ...tooltipStyle }},
+    scales: {
+      y: { grid: { color: '#2a2d3e' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'K' }},
+      x: { grid: { display: false }},
+    }
+  }
+});
+</script>
+</body>
+</html>
